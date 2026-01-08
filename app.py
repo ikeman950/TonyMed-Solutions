@@ -39,12 +39,6 @@ app = Flask(__name__)
 
 
 
-UPLOAD_FOLDER = 'static/uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Create folder if not exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 
 # Secret key (needed for flash messages and security)
 app.config['SECRET_KEY'] = 'ghana_my_pharmacy_2025_super_secure_key_!@#456'
@@ -154,7 +148,7 @@ class Settings(db.Model):
     pharmacy_location = db.Column(db.String(200), default="")
     currency_symbol = db.Column(db.String(10), default="GH₵")
     low_stock_threshold = db.Column(db.Integer, default=10)
-    logo_filename = db.Column(db.String(200), default="")  # e.g. "logo.png"
+    logo_url = db.Column(db.String(500), default="")  # URL instead of filename
 
 
 # User model for login
@@ -715,9 +709,10 @@ def monthly_report():
 @login_required
 def settings():
     if not current_user.is_owner:
-        flash('Only the owner can access settings!', 'danger')
+        flash('Only the pharmacy owner can access settings!', 'danger')
         return redirect(url_for('home'))
     
+    # Get or create the single settings record
     setting = Settings.query.first()
     if not setting:
         setting = Settings()
@@ -725,36 +720,32 @@ def settings():
         db.session.commit()
     
     if request.method == 'POST':
-        setting.pharmacy_name = request.form['pharmacy_name']
-        setting.pharmacy_phone = request.form['pharmacy_phone']
-        setting.pharmacy_location = request.form['pharmacy_location']
-        setting.currency_symbol = request.form['currency_symbol']
-        setting.low_stock_threshold = int(request.form['low_stock_threshold'])
+        # Update text fields
+        setting.pharmacy_name = request.form['pharmacy_name'].strip()
+        setting.pharmacy_phone = request.form['pharmacy_phone'].strip()
+        setting.pharmacy_location = request.form['pharmacy_location'].strip()
+        setting.currency_symbol = request.form['currency_symbol'].strip()
         
-        # Handle logo upload
-        if 'logo' in request.files:
-            file = request.files['logo']
-            if file and file.filename != '':
-                # Create folder if missing
-                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-                
-                filename = secure_filename(file.filename)
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                file.save(file_path)
-                setting.logo_filename = filename
+        try:
+            setting.low_stock_threshold = int(request.form['low_stock_threshold'])
+        except ValueError:
+            setting.low_stock_threshold = 10  # fallback
+        
+        # Update logo URL (from text input, not file upload)
+        logo_url_input = request.form['logo_url'].strip()
+        setting.logo_url = logo_url_input if logo_url_input.startswith('http') else ""
         
         db.session.commit()
         flash('Settings saved successfully!', 'success')
         return redirect(url_for('settings'))
     
-    logo_url = f"/uploads/{setting.logo_filename}" if setting.logo_filename else None
+    # For GET request — prepare current logo URL
+    current_logo_url = setting.logo_url if setting.logo_url else None
     
-    return render_template('settings.html', setting=setting, logo_url=logo_url)
-
-# Serve uploaded logos
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    return render_template('settings.html', 
+                           setting=setting, 
+                           current_logo_url=current_logo_url)
+    
 
 
 
