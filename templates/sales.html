@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">💊 New Sale / Billing</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- Customer Info Section (Persistent) -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Customer Information (Optional)</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label">Customer Name</label>
+                <input type="text" id="customer_name" class="form-control" placeholder="e.g., Kwame Asare">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Customer Phone</label>
+                <input type="text" id="customer_phone" class="form-control" placeholder="e.g., 0241234567">
+                <small class="text-muted">Ghana number format</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Medicine Form -->
+<form method="POST" class="mb-4">
+    <input type="hidden" name="add_to_cart" value="1">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+              <label class="form-label">Select Medicine (Searchable)</label>
+              <select name="medicine_id" class="form-select searchable-select" required>
+                  <option value="">Type medicine name to search...</option>
+                  {% for med in medicines %}
+                      <option value="{{ med.id }}">{{ med.name }} (Stock: {{ med.quantity }} | {{ CURRENCY_SYMBOL }} {{ "%.2f"|format(med.sell_price) }})</option>
+                  {% endfor %}
+              </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Quantity</label>
+            <input type="number" name="quantity" class="form-control" min="1" required>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+        </div>
+    </div>
+</form>
+
+<!-- Cart Table -->
+{% if cart %}
+<h4>Cart</h4>
+<table class="table table-bordered">
+    <thead class="table-success">
+        <tr>
+            <th>Medicine</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in cart %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.qty }}</td>
+            <td>{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(item.price) }}</td>
+            <td>{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(item.subtotal) }}</td>
+        </tr>
+        {% endfor %}
+        <tr class="table-primary fw-bold">
+            <td colspan="3">Total</td>
+            <td>{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(total) }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Complete Sale Form (Separate) -->
+<form method="POST" class="mt-4 text-center">
+    <input type="hidden" name="complete_sale" value="1">
+    <input type="hidden" name="customer_name" id="hidden_name">
+    <input type="hidden" name="customer_phone" id="hidden_phone">
+    <button type="submit" class="btn btn-success btn-lg px-5">Complete Sale & Print Receipt</button>
+    <a href="{{ url_for('sales') }}" class="btn btn-outline-secondary btn-lg ms-3" onclick="return confirm('Clear cart?')">Clear Cart</a>
+</form>
+
+<script>
+// Copy customer info to hidden fields before complete sale
+document.querySelector('form:last-of-type button[type="submit"]').addEventListener('click', function() {
+    document.getElementById('hidden_name').value = document.getElementById('customer_name').value.trim();
+    document.getElementById('hidden_phone').value = document.getElementById('customer_phone').value.trim();
+});
+</script>
+{% else %}
+<p class="text-muted text-center">Cart is empty. Add medicines to start billing.</p>
+{% endif %}
+{% endblock %}

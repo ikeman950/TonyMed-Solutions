@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="printable">  <!-- Everything inside this will print -->
+
+    <h2 class="mb-4 text-center">⚠️ Low Stock Report</h2>
+    <p class="text-muted text-center mb-5">Medicines with quantity below <strong>{{ threshold }}</strong> units</p>
+
+    <div class="alert alert-warning text-center" role="alert">
+        <h4>{{ count }} medicine(s) need reordering!</h4>
+    </div>
+
+    {% if medicines %}
+    <table class="table table-striped table-hover">
+        <thead class="table-danger">
+            <tr>
+                <th>Name</th>
+                <th>Batch</th>
+                <th>Current Stock</th>
+                <th>Sell Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for med in medicines %}
+            <tr class="table-warning">
+                <td><strong>{{ med.name }}</strong></td>
+                <td>{{ med.batch or "-" }}</td>
+                <td class="fw-bold text-danger">{{ med.quantity }} (LOW!)</td>
+                <td>{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(med.sell_price) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-success text-center">
+        <h4>🎉 Excellent! All medicines are well stocked!</h4>
+        <p>No item below {{ threshold }} units.</p>
+    </div>
+    {% endif %}
+
+</div>  <!-- End of printable area -->
+
+<!-- Buttons visible only on screen (hidden when printing) -->
+<div class="text-center mt-4 no-print">
+    <button onclick="window.print()" class="btn btn-success btn-lg">
+        🖨️ Print / Save as PDF
+    </button>
+    <a href="{{ url_for('inventory') }}" class="btn btn-primary btn-lg ms-3">Go to Inventory</a>
+    <a href="{{ url_for('sales') }}" class="btn btn-secondary btn-lg ms-3">New Sale</a>
+</div>
+{% endblock %}

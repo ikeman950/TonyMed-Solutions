@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">💸 Expenditure Report</h2>
+
+<a href="{{ url_for('add_expenditure') }}" class="btn btn-danger mb-3">+ Add Expenditure</a>
+
+<div class="card mb-4">
+    <div class="card-body text-center">
+        <h4>Total Expenditure</h4>
+        <h1 class="text-danger">{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(total) }}</h1>
+    </div>
+</div>
+
+{% if expenditures %}
+<table class="table table-striped">
+    <thead class="table-danger">
+        <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for exp in expenditures %}
+        <tr>
+            <td>{{ exp.date }}</td>
+            <td>{{ exp.description }}</td>
+            <td class="text-danger fw-bold">{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(exp.amount) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info text-center">
+    No expenditures recorded yet.
+</div>
+{% endif %}
+
+<a href="{{ url_for('home') }}" class="btn btn-secondary">Back to Home</a>
+{% endblock %}

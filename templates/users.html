@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h2 class="mb-4 text-center">👥 Manage Staff Users</h2>
+
+            <div class="text-end mb-3">
+                <a href="{{ url_for('add_user') }}" class="btn btn-primary">
+                    + Add New Staff
+                </a>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <div class="card shadow">
+                <div class="card-body">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if users %}
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td><strong>{{ user.username }}</strong></td>
+                                    <td>
+                                        {% if user.is_owner %}
+                                            <span class="badge bg-success fs-6">Owner (Full Control)</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary fs-6">Staff</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if not user.is_owner %}
+                                            <a href="{{ url_for('delete_user', id=user.id) }}" 
+                                               class="btn btn-sm btn-outline-danger"
+                                               onclick="return confirm('Delete user {{ user.username }}? This cannot be undone!')">
+                                                Delete
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted small">Cannot delete owner</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        <h5>No staff users yet</h5>
+                                        <p>Click "+ Add New Staff" to create users.</p>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <strong>ℹ️ Important:</strong><br>
+                The <strong>first user created during setup</strong> is the pharmacy owner with full control.<br>
+                Only the owner can add or delete staff accounts.
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

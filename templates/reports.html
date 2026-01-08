@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="printable">
+
+    <h2 class="mb-4 text-center">📊 Sales Report</h2>
+
+    <!-- Date Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="POST" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="start_date" class="form-control" value="{{ start_date }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="end_date" class="form-control" value="{{ end_date }}" required>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">Filter Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <h4>Total Earnings ({{ start_date }} to {{ end_date }})</h4>
+            <h1 class="text-success">{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(period_total) }}</h1>
+            <p class="text-muted">{{ sales|length }} sale(s) found</p>
+        </div>
+    </div>
+
+    <!-- Detailed Sales -->
+    {% if sale_items %}
+    <h4>Detailed Items Sold</h4>
+    <table class="table table-striped">
+        <thead class="table-primary">
+            <tr>
+                <th>Date</th>
+                <th>Sale ID</th>
+                <th>Medicine</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+           {% for item in sale_items %}
+           <tr>
+                <td>{{ item.sale_date }}</td>
+                <td>#{{ item.sale_id }}</td>
+                <td>{{ medicine_dict.get(item.medicine_id, 'Unknown') }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(item.price) }}</td>
+                <td>{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(item.subtotal) }}</td>
+           </tr>
+           {% endfor %}
+       </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <h4>No sales found in this date range.</h4>
+        <p>Try a wider date range or make some sales!</p>
+    </div>
+    {% endif %}
+
+</div> <!-- End printable -->
+
+<!-- Print Button -->
+<div class="text-center mt-4 no-print">
+    <button onclick="window.print()" class="btn btn-success btn-lg">
+        🖨️ Print / Save as PDF
+    </button>
+    <a href="{{ url_for('sales') }}" class="btn btn-primary btn-lg ms-3">New Sale</a>
+</div>
+{% endblock %}

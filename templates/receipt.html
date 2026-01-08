@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="printable">  <!-- All content inside this will be printed -->
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header text-center">
+                {% if LOGO_URL %}
+                    <img src="{{ LOGO_URL }}" alt="Pharmacy Logo" style="height: 80px; margin-bottom: 10px;">
+                    <br>
+                {% endif %}
+                <h3>🏥 {{ PHARMACY_NAME }}</h3>
+                <h4>CALL: {{ PHARMACY_PHONE }}</h4>
+                <p>{{ PHARMACY_LOCATION }}</p>
+                <h4>OFFICIAL RECEIPT</h4>
+                <p>Date: {{ date }} | Sale ID: #{{ sale_id }}</p>
+                {% if customer_name or customer_phone %}
+                    <p class="mb-0">
+                        <strong>Customer:</strong>
+                        {% if customer_name %}{{ customer_name }}{% endif %}
+                        {% if customer_phone %} ({{ customer_phone }}){% endif %}
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td class="text-center">{{ item.qty }}</td>
+                            <td>{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(item.price) }}</td>
+                            <td>{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(item.subtotal) }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="table-primary fw-bold">
+                            <td colspan="3" class="text-end">Total</td>
+                            <td>{{ CURRENCY_SYMBOL }} {{ "%.2f"|format(total) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="text-center mt-5">
+                    <p class="fs-5"><strong>Thank you! Come again! </strong></p>
+                    <i><p class="text-muted small">Powered by TonyMed IT Solutions</i></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>  <!-- End of printable area -->
+
+<!-- Buttons visible only on screen -->
+<div class="text-center mt-4 no-print">
+    <button onclick="window.print()" class="btn btn-success btn-lg px-5">
+        🖨️ Print / Save as PDF
+    </button>
+    <a href="{{ url_for('sales') }}" class="btn btn-primary btn-lg ms-3">
+        New Sale
+    </a>
+</div>
+{% endblock %}

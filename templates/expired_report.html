@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">⚠️ Expired & Near-Expiry Medicines Report</h2>
+<p class="text-muted">As of {{ today }}</p>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h4>Expired Medicines</h4>
+                <h2>{{ expired_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h4>Expiring Within 30 Days</h4>
+                <h2>{{ near_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if critical_medicines %}
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Batch</th>
+            <th>Expiry Date</th>
+            <th>Status</th>
+            <th>Quantity Left</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for med in critical_medicines %}
+        <tr {% if med.status == "Expired" %} class="table-danger" {% else %} class="table-warning" {% endif %}>
+            <td><strong>{{ med.name }}</strong></td>
+            <td>{{ med.batch or "-" }}</td>
+            <td>{{ med.expiry }}</td>
+            <td>
+                {% if med.status == "Expired" %}
+                <span class="badge bg-danger">Expired ({{ med.days_info }})</span>
+                {% else %}
+                <span class="badge bg-warning text-dark">Expiring Soon ({{ med.days_info }})</span>
+                {% endif %}
+            </td>
+            <td>{{ med.quantity }}</td>
+            <td>
+                <a href="{{ url_for('edit_medicine', id=med.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                <a href="{{ url_for('delete_medicine', id=med.id) }}" class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Delete this medicine?')">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-success text-center">
+    <h4>🎉 Great job! No expired or near-expiry medicines!</h4>
+    <p>All your stock is fresh and safe to sell.</p>
+</div>
+{% endif %}
+
+<div class="text-center mt-4">
+    <a href="{{ url_for('inventory') }}" class="btn btn-primary">Back to Inventory</a>
+</div>
+{% endblock %}
