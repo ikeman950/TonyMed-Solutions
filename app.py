@@ -43,9 +43,11 @@ app = Flask(__name__)
 # Secret key (needed for flash messages and security)
 app.config['SECRET_KEY'] = 'ghana_my_pharmacy_2025_super_secure_key_!@#456'
 
-# Database setup (SQLite file will be created automatically)
+# Database setup (SQLite file in project root)
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'pharmacy.db') + '?timeout=30'
+db_path = os.path.join(basedir, 'pharmacy.db')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}?timeout=30'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Connect SQLAlchemy to our app
