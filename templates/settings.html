@@ -1,55 +1,87 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="mb-4 text-center">⚙️ Pharmacy Settings</h2>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="mb-4 text-center">⚙️ Pharmacy Settings</h2>
 
-<div class="card shadow">
-    <div class="card-body">
-        <form method="POST" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label">Pharmacy Name</label>
-                        <input type="text" name="pharmacy_name" class="form-control" value="{{ setting.pharmacy_name }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Phone Number</label>
-                        <input type="text" name="pharmacy_phone" class="form-control" value="{{ setting.pharmacy_phone }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Location</label>
-                        <input type="text" name="pharmacy_location" class="form-control" value="{{ setting.pharmacy_location }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label">Currency Symbol</label>
-                        <input type="text" name="currency_symbol" class="form-control" value="{{ setting.currency_symbol }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Low Stock Threshold</label>
-                        <input type="number" name="low_stock_threshold" class="form-control" value="{{ setting.low_stock_threshold }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Upload Logo</label>
-                        <input type="file" name="logo" class="form-control" accept="image/*">
-                        {% if logo_url %}
-                            <div class="mt-2">
-                                <p>Current logo:</p>
-                                <img src="{{ logo_url }}" alt="Current logo" style="max-height: 150px; border-radius: 8px;">
+            <div class="card shadow">
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Pharmacy Name</label>
+                                    <input type="text" name="pharmacy_name" class="form-control" 
+                                           value="{{ setting.pharmacy_name }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Phone Number</label>
+                                    <input type="text" name="pharmacy_phone" class="form-control" 
+                                           value="{{ setting.pharmacy_phone }}" placeholder="e.g., 0541601410">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Location</label>
+                                    <input type="text" name="pharmacy_location" class="form-control" 
+                                           value="{{ setting.pharmacy_location }}" placeholder="e.g., Accra, Ghana">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Currency Symbol</label>
+                                    <input type="text" name="currency_symbol" class="form-control" 
+                                           value="{{ setting.currency_symbol }}" required>
+                                    <small class="text-muted">e.g., GH₵, $, ₦</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Low Stock Threshold</label>
+                                    <input type="number" name="low_stock_threshold" class="form-control" 
+                                           value="{{ setting.low_stock_threshold }}" min="1" required>
+                                    <small class="text-muted">Alert when stock falls below this number</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Logo URL</label>
+                                    <input type="url" name="logo_url" class="form-control" 
+                                           value="{{ setting.logo_url }}" 
+                                           placeholder="https://example.com/your-logo.png">
+                                    <small class="text-muted">
+                                        Paste a direct link to your logo (upload to Imgur, Facebook, Google Drive, etc.)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Logo Preview -->
+                        {% if current_logo_url %}
+                            <div class="text-center mt-4">
+                                <p class="fw-bold">Current Logo Preview:</p>
+                                <img src="{{ current_logo_url }}" alt="Current logo" 
+                                     style="max-height: 200px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
                             </div>
                         {% endif %}
-                    </div>
+
+                        <!-- Save Button -->
+                        <div class="text-center mt-5">
+                            <button type="submit" class="btn btn-success btn-lg px-5">
+                                Save Settings
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-success btn-lg px-5">Save Settings</button>
-            </div>
-        </form>
-    </div>
-</div>
 
-<div class="text-center mt-4">
-    <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">Back to Home</a>
+            <div class="text-center mt-4">
+                <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-lg">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
