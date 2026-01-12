@@ -168,10 +168,15 @@ class User(db.Model):
 # Home page
 @app.route('/')
 def index():
+    # If no users exist → brand new install → show setup
     if User.query.count() == 0:
         return redirect(url_for('setup'))
+    
+    # If user is logged in → show home/dashboard
     if current_user.is_authenticated:
         return redirect(url_for('home'))
+    
+    # Users exist but not logged in → show login
     return redirect(url_for('login'))
 
 @app.route('/home')
@@ -588,7 +593,7 @@ def low_stock_report():
 
 @app.route('/setup', methods=['GET', 'POST'])
 def setup():
-    if User.query.first():
+    if User.query.count() > 0:
         return redirect(url_for('login'))
     
     if request.method == 'POST':
@@ -603,13 +608,15 @@ def setup():
         owner_user = User(
             username=username,
             password=hashed_pw,
-            is_owner=True  # This makes them the permanent owner
+            is_owner=True  # Permanent owner
         )
         db.session.add(owner_user)
         db.session.commit()
         
-        flash(f'Welcome {username}! You are the pharmacy owner with full control.', 'success')
+        # AUTO-LOGIN after setup (like Facebook/X)
         login_user(owner_user)
+        
+        flash(f'Welcome {username}! Your pharmacy system is ready. You have full owner rights.', 'success')
         return redirect(url_for('home'))
     
     return render_template('setup.html')
