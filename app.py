@@ -14,24 +14,7 @@ import time
 import shutil
 from datetime import datetime
 
-def create_backup():
-    if not os.path.exists('pharmacy.db'):
-        return  # No database yet
-    
-    # Create backups folder if not exists
-    backup_folder = 'backups'
-    os.makedirs(backup_folder, exist_ok=True)
-    
-    # Create filename with date and time
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    backup_filename = f"pharmacy_backup_{timestamp}.db"
-    backup_path = os.path.join(backup_folder, backup_filename)
-    
-    try:
-        shutil.copy('pharmacy.db', backup_path)
-        print(f"Backup created: {backup_path}")
-    except Exception as e:
-        print(f"Backup failed: {e}")
+
 
 
 # Create the app
@@ -71,7 +54,7 @@ def inject_settings():
     setting = Settings.query.first()
     if not setting:
         setting = Settings()  # fallback
-    logo_url = f"/uploads/{setting.logo_filename}" if setting.logo_filename else None
+    logo_url = setting.logo_url if setting.logo_url else None
     return dict(
         setting=setting,
         LOGO_URL=logo_url,
@@ -81,6 +64,7 @@ def inject_settings():
         CURRENCY_SYMBOL=setting.currency_symbol,
         LOW_STOCK_THRESHOLD=setting.low_stock_threshold
     )
+
 
 # Flask-Login setup
 login_manager = LoginManager()
@@ -783,42 +767,7 @@ def change_password():
     return render_template('change_password.html')
 
 
-@app.route('/restore_backup', methods=['GET', 'POST'])
-@login_required
-def restore_backup():
-    if not current_user.is_owner:
-        flash('Only the pharmacy owner can restore backups!', 'danger')
-        return redirect(url_for('home'))
-    
-    backup_folder = 'backups'
-    
-    if request.method == 'POST':
-        backup_file = request.form['backup_file']
-        backup_path = os.path.join(backup_folder, backup_file)
-        
-        if os.path.exists(backup_path):
-            # Backup current database
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            shutil.copy('pharmacy.db', f'backups/pharmacy_before_restore_{timestamp}.db')
-            
-            # Restore selected backup
-            shutil.copy(backup_path, 'pharmacy.db')
-            flash(f'Backup {backup_file} restored successfully! App will restart with old data.', 'success')
-        else:
-            flash('Backup file not found!', 'danger')
-        
-        return redirect(url_for('restore_backup'))
-    
-    # List all backups
-    if not os.path.exists(backup_folder):
-        backups = []
-    else:
-        backups = sorted([
-            f for f in os.listdir(backup_folder) 
-            if f.startswith('pharmacy_backup_') and f.endswith('.db')
-        ], reverse=True)  # Newest first
-    
-    return render_template('restore_backup.html', backups=backups)
+
 
 
 def open_browser():
@@ -846,8 +795,6 @@ if __name__ == '__main__':
         db.create_all()
         print("Database tables ready!")
 
-    # Create automatic backup on startup
-    create_backup()
     
     # Open browser after 3 seconds (gives time for server + backup)
     Timer(3, open_browser).start()
