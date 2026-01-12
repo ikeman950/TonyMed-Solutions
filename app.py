@@ -837,6 +837,10 @@ def open_browser():
         print("Open http://127.0.0.1:5000 manually")
 
 
+@app.errorhandler(500)
+def internal_error(error):
+    return "Server error — check logs or contact support", 500
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
