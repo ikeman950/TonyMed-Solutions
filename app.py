@@ -11,7 +11,6 @@ from threading import Timer
 import sys
 import os
 import time
-import shutil
 from datetime import datetime
 
 
@@ -378,8 +377,6 @@ def sales():
 
 
 
-from datetime import datetime  # Make sure this is at the top
-
 @app.route('/reports', methods=['GET', 'POST'])
 @login_required
 def reports():
@@ -692,7 +689,7 @@ def settings():
         flash('Only the pharmacy owner can access settings!', 'danger')
         return redirect(url_for('home'))
     
-    # Get or create the single settings record
+    # Get or create the single settings record (fallback if missing)
     setting = Settings.query.first()
     if not setting:
         setting = Settings()
@@ -700,26 +697,33 @@ def settings():
         db.session.commit()
     
     if request.method == 'POST':
-        # Update text fields
-        setting.pharmacy_name = request.form['pharmacy_name'].strip()
-        setting.pharmacy_phone = request.form['pharmacy_phone'].strip()
-        setting.pharmacy_location = request.form['pharmacy_location'].strip()
-        setting.currency_symbol = request.form['currency_symbol'].strip()
+        # Update text fields with proper stripping
+        setting.pharmacy_name = request.form.get('pharmacy_name', '').strip()
+        setting.pharmacy_phone = request.form.get('pharmacy_phone', '').strip()
+        setting.pharmacy_location = request.form.get('pharmacy_location', '').strip()
+        setting.currency_symbol = request.form.get('currency_symbol', 'GH₵').strip()
         
+        # Safe integer conversion for threshold
         try:
-            setting.low_stock_threshold = int(request.form['low_stock_threshold'])
+            threshold_input = request.form.get('low_stock_threshold', '10').strip()
+            setting.low_stock_threshold = int(threshold_input)
+            if setting.low_stock_threshold < 1:
+                setting.low_stock_threshold = 1  # Minimum 1
         except ValueError:
-            setting.low_stock_threshold = 10  # fallback
+            setting.low_stock_threshold = 10  # Fallback
         
-        # Update logo URL (from text input, not file upload)
-        logo_url_input = request.form['logo_url'].strip()
-        setting.logo_url = logo_url_input if logo_url_input.startswith('http') else ""
+        # Logo URL validation (must start with http/https)
+        logo_url_input = request.form.get('logo_url', '').strip()
+        if logo_url_input and (logo_url_input.startswith('http://') or logo_url_input.startswith('https://')):
+            setting.logo_url = logo_url_input
+        else:
+            setting.logo_url = ""  # Clear if invalid
         
         db.session.commit()
         flash('Settings saved successfully!', 'success')
         return redirect(url_for('settings'))
     
-    # For GET request — prepare current logo URL
+    # Prepare current logo URL for preview
     current_logo_url = setting.logo_url if setting.logo_url else None
     
     return render_template('settings.html', 
