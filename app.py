@@ -67,6 +67,15 @@ login_manager.login_view = 'login'
 login_manager.login_message = "Please log in to access the system."
 login_manager.login_message_category = "info"
 
+# Auto-create tables on first request (Vercel safe)
+@app.before_request
+def ensure_tables():
+    if not hasattr(app, 'tables_created'):
+        with app.app_context():
+            db.create_all()
+            app.tables_created = True  # Only run once per deployment
+            print("Tables created on first request!")
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
