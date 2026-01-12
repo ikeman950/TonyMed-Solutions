@@ -168,15 +168,16 @@ class User(db.Model):
 # Home page
 @app.route('/')
 def index():
-    # If no users exist → brand new install → show setup
+    # Special case: if coming from setup, don't redirect back
+    if request.args.get('from_setup') == 'true':
+        return redirect(url_for('login'))
+    
     if User.query.count() == 0:
         return redirect(url_for('setup'))
     
-    # If user is logged in → show home/dashboard
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     
-    # Users exist but not logged in → show login
     return redirect(url_for('login'))
 
 @app.route('/home')
