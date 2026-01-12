@@ -44,10 +44,20 @@
                         </div>
                     </form>
 
-                    <div class="text-center mt-4 text-muted small">
-                        This is a one-time step. After setup, you'll have full control.
+                    <!-- Log In Link -->
+                    <div class="text-center mt-4">
+                        <p class="text-muted">
+                            Already have an account? 
+                            <a href="{{ url_for('login') }}" class="text-primary fw-bold">
+                                Log in here
+                            </a>
+                        </p>
                     </div>
                 </div>
+            </div>
+
+            <div class="text-center mt-4 text-muted small">
+                This is a one-time step. After setup, you'll have full control.
             </div>
         </div>
     </div>
