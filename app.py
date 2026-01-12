@@ -167,9 +167,17 @@ class User(db.Model):
 
 # Home page
 @app.route('/')
-@login_required
-def home():
-    return render_template('home.html')
+def index():
+    # Step 1: If no users exist (fresh install) → go to setup
+    if User.query.count() == 0:
+        return redirect(url_for('setup'))
+    
+    # Step 2: If user is logged in → go to home/dashboard
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))  # or render_template('home.html')
+    
+    # Step 3: Users exist, but not logged in → show login
+    return redirect(url_for('login'))
 
 @app.route('/inventory')
 @login_required
