@@ -2,17 +2,54 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Setup Page (Test)</h2>
-    <form method="POST">
-        <div class="mb-3">
-            <label>Username</label>
-            <input type="text" name="username" class="form-control" required>
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="text-center mb-5">
+                <h1 class="fw-bold mb-3">Welcome to Your Pharmacy System</h1>
+                <p class="lead text-muted">This is the first-time setup. Create your owner account to get started.</p>
+            </div>
+
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-5">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for category, message in messages %}
+                          <div class="alert alert-{{ category }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Username</label>
+                            <input type="text" name="username" class="form-control form-control-lg" 
+                                   placeholder="Choose a username" required autofocus>
+                            <small class="text-muted">This will be your owner/admin username</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Password</label>
+                            <input type="password" name="password" class="form-control form-control-lg" 
+                                   placeholder="Create a strong password" required>
+                            <small class="text-muted">Minimum 6 characters</small>
+                        </div>
+
+                        <div class="d-grid mt-5">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold">
+                                Complete Setup & Start Managing
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4 text-muted small">
+                        This is a one-time step. After setup, you'll have full control.
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label>Password</label>
-            <input type="password" name="password" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-success">Complete Setup</button>
-    </form>
+    </div>
 </div>
 {% endblock %}
