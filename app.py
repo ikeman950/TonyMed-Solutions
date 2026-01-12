@@ -19,7 +19,8 @@ from datetime import datetime
 # Create the app
 app = Flask(__name__)
 
-
+# IMPORTANT: Force instance_path to writable location on Vercel
+app.instance_path = '/tmp'  # ← This line fixes the error
 
 
 app.config['SECRET_KEY'] = 'ghana_my_pharmacy_2025_super_secure_key_!@#456'
