@@ -23,14 +23,8 @@ app = Flask(__name__)
 
 
 
-# Secret key (needed for flash messages and security)
 app.config['SECRET_KEY'] = 'ghana_my_pharmacy_2025_super_secure_key_!@#456'
-
-# Database setup (SQLite file in project root)
-basedir = os.path.abspath(os.path.dirname(__file__))
-db_path = os.path.join(basedir, 'pharmacy.db')
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}?timeout=30'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pharmacy.db'  # Vercel creates it
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Connect SQLAlchemy to our app
