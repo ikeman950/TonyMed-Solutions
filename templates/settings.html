@@ -3,55 +3,60 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <h2 class="mb-4 text-center">⚙️ My Pharmacy Settings</h2>
+        <div class="col-lg-8 col-md-10">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">⚙️ Pharmacy Settings</h2>
+                <p class="text-muted">Customize your pharmacy details, currency, low stock alerts, and logo</p>
+            </div>
 
-            <div class="card shadow">
-                <div class="card-body">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-5">
                     <form method="POST">
-                        <div class="row g-3">
+                        <div class="row g-4">
+                            <!-- Left Column -->
                             <div class="col-md-6">
-                                <div class="mb-3">
+                                <div class="mb-4">
                                     <label class="form-label fw-bold">Pharmacy Name</label>
-                                    <input type="text" name="pharmacy_name" class="form-control" 
-                                           value="{{ setting.pharmacy_name }}" required>
+                                    <input type="text" name="pharmacy_name" class="form-control form-control-lg" 
+                                           value="{{ setting.pharmacy_name }}" required placeholder="e.g., Grace Koffie Pharmacy Ltd">
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-4">
                                     <label class="form-label fw-bold">Phone Number</label>
-                                    <input type="text" name="pharmacy_phone" class="form-control" 
+                                    <input type="tel" name="pharmacy_phone" class="form-control form-control-lg" 
                                            value="{{ setting.pharmacy_phone }}" placeholder="e.g., 0541601410">
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-4">
                                     <label class="form-label fw-bold">Location</label>
-                                    <input type="text" name="pharmacy_location" class="form-control" 
+                                    <input type="text" name="pharmacy_location" class="form-control form-control-lg" 
                                            value="{{ setting.pharmacy_location }}" placeholder="e.g., Accra, Ghana">
                                 </div>
                             </div>
 
+                            <!-- Right Column -->
                             <div class="col-md-6">
-                                <div class="mb-3">
+                                <div class="mb-4">
                                     <label class="form-label fw-bold">Currency Symbol</label>
-                                    <input type="text" name="currency_symbol" class="form-control" 
-                                           value="{{ setting.currency_symbol }}" required>
-                                    <small class="text-muted">e.g., GH₵, $, ₦</small>
+                                    <input type="text" name="currency_symbol" class="form-control form-control-lg" 
+                                           value="{{ setting.currency_symbol }}" required placeholder="e.g., GH₵, $, ₦">
+                                    <small class="text-muted form-text">Used on receipts and reports</small>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-4">
                                     <label class="form-label fw-bold">Low Stock Threshold</label>
-                                    <input type="number" name="low_stock_threshold" class="form-control" 
+                                    <input type="number" name="low_stock_threshold" class="form-control form-control-lg" 
                                            value="{{ setting.low_stock_threshold }}" min="1" required>
-                                    <small class="text-muted">Alert when stock falls below this number</small>
+                                    <small class="text-muted form-text">Alert when stock falls below this number</small>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="mb-4">
                                     <label class="form-label fw-bold">Logo URL</label>
-                                    <input type="url" name="logo_url" class="form-control" 
+                                    <input type="url" name="logo_url" class="form-control form-control-lg" 
                                            value="{{ setting.logo_url }}" 
-                                           placeholder="https://example.com/your-logo.png">
-                                    <small class="text-muted">
-                                        Paste a direct link to your logo (upload to Imgur, Facebook, Google Drive, etc.)
+                                           placeholder="https://i.imgur.com/your-logo.png">
+                                    <small class="text-muted form-text">
+                                        Paste a direct image link (upload to Imgur, Facebook, Google Drive, etc.)
                                     </small>
                                 </div>
                             </div>
@@ -59,16 +64,16 @@
 
                         <!-- Current Logo Preview -->
                         {% if current_logo_url %}
-                            <div class="text-center mt-4">
-                                <p class="fw-bold">Current Logo Preview:</p>
-                                <img src="{{ current_logo_url }}" alt="Current logo" 
-                                     style="max-height: 200px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                            <div class="text-center mt-5">
+                                <p class="fw-bold mb-3">Current Logo Preview</p>
+                                <img src="{{ current_logo_url }}" alt="Current pharmacy logo" 
+                                     class="img-fluid rounded-3 shadow" style="max-height: 250px;">
                             </div>
                         {% endif %}
 
                         <!-- Save Button -->
                         <div class="text-center mt-5">
-                            <button type="submit" class="btn btn-success btn-lg px-5">
+                            <button type="submit" class="btn btn-success btn-lg px-5 py-3 fw-bold">
                                 Save Settings
                             </button>
                         </div>
@@ -76,8 +81,9 @@
                 </div>
             </div>
 
-            <div class="text-center mt-4">
-                <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-lg">
+            <!-- Back Button -->
+            <div class="text-center mt-5">
+                <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-lg px-5">
                     ← Back to Home
                 </a>
             </div>
