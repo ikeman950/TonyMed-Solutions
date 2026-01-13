@@ -168,10 +168,12 @@ class User(db.Model):
 # Home page
 @app.route('/')
 def index():
-    if User.query.count() == 0:
-        return redirect(url_for('setup'))
+    # If user is already logged in → straight to dashboard/home
     if current_user.is_authenticated:
         return redirect(url_for('home'))
+    
+    # Otherwise → always show login page (default landing page)
+    # Even for brand new users — they will see the "Sign up" link
     return redirect(url_for('login'))
 
 @app.route('/home')
