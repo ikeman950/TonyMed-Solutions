@@ -487,11 +487,15 @@ def expired_report():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # If no users exist, go to setup
-    if not User.query.first():
-        return redirect(url_for('setup'))
+    # If already logged in → go home
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    # No setup check here — login is always the default page
+    # New users will see "Sign up" link on this page
+    
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form['username'].strip()
         password = request.form['password']
         
         user = User.query.filter_by(username=username).first()
