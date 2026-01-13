@@ -588,9 +588,15 @@ def low_stock_report():
                            count=len(low_stock_medicines))
 
 
-@app.route('/setup', methods=['GET', 'POST'])
-def setup():
-    if User.query.count() > 0:
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    # If already logged in → go home
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    # If owner already exists → prevent new signup
+    if User.query.filter_by(is_owner=True).first():
+        flash('An owner account already exists. Please log in.', 'info')
         return redirect(url_for('login'))
     
     if request.method == 'POST':
@@ -599,24 +605,28 @@ def setup():
         
         if len(password) < 6:
             flash('Password must be at least 6 characters', 'danger')
-            return render_template('setup.html')
+            return render_template('signup.html')
+        
+        if User.query.filter_by(username=username).first():
+            flash('Username already taken', 'danger')
+            return render_template('signup.html')
         
         hashed_pw = generate_password_hash(password)
         owner_user = User(
             username=username,
             password=hashed_pw,
-            is_owner=True  # Permanent owner
+            is_owner=True  # First signup = owner
         )
         db.session.add(owner_user)
         db.session.commit()
         
-        # AUTO-LOGIN after setup (like Facebook/X)
+        # Auto-login
         login_user(owner_user)
         
-        flash(f'Welcome {username}! Your pharmacy system is ready. You have full owner rights.', 'success')
+        flash(f'Welcome {username}! Your account is ready — you are the owner.', 'success')
         return redirect(url_for('home'))
     
-    return render_template('setup.html')
+    return render_template('signup.html')
 
 
 @app.route('/add_expenditure', methods=['GET', 'POST'])
