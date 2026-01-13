@@ -168,16 +168,10 @@ class User(db.Model):
 # Home page
 @app.route('/')
 def index():
-    # Special case: if coming from setup, don't redirect back
-    if request.args.get('from_setup') == 'true':
-        return redirect(url_for('login'))
-    
     if User.query.count() == 0:
         return redirect(url_for('setup'))
-    
     if current_user.is_authenticated:
         return redirect(url_for('home'))
-    
     return redirect(url_for('login'))
 
 @app.route('/home')
